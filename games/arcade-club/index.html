@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Arcade Club · Little games. Big fun.</title>
+  <meta name="description" content="Eight colorful mini-games for 1 to 3 players, playable right in your browser.">
+  <meta name="theme-color" content="#241A3D">
+
+  <!-- Rounded display font (falls back to system rounded fonts if offline) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Kalam:wght@400;700&display=swap">
+
+  <link rel="stylesheet" href="css/arcade.css?v=4">
+  <link rel="stylesheet" href="css/nook-skin.css?v=11">
+  <style>html, body { margin: 0; background: #241A3D; } html[data-theme="light"], html[data-theme="light"] body { background: #f5f4ed; } html[data-theme="dark"], html[data-theme="dark"] body { background: #1a1918; } .in-nook .arc-back-site { display: none !important; }</style>
+  <!-- When opened inside Zone, Zone's own back button is used instead of "Back to site" -->
+  <script>
+    if (window.self !== window.top) document.documentElement.classList.add('in-nook');
+    /* follow Zone's theme + motion settings (same browser storage as Zone) */
+    (function () {
+      function apply() {
+        var s = {}; try { s = JSON.parse(localStorage.getItem('nook:settings') || '{}') || {}; } catch (e) {}
+        var h = new Date().getHours(), ds = typeof s.dayStart === 'number' ? s.dayStart : 7, ns = typeof s.nightStart === 'number' ? s.nightStart : 19;
+        var t = s.theme === 'light' || s.theme === 'dark' ? s.theme : (h >= ds && h < ns ? 'light' : 'dark');
+        var reduce = s.motion === 'reduce' || (s.motion !== 'allow' && window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+        document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-motion', reduce ? 'reduce' : (s.anim || 'full'));
+      }
+      apply(); window.addEventListener('storage', apply); setInterval(apply, 60000);
+    })();
+  </script>
+</head>
+<body>
+  <!--
+    The arcade renders itself inside this element.
+    data-home-href  : where the "Back to site" button goes (your homepage)
+    data-home-label : text on that button
+  -->
+  <div id="arcade-club" data-arcade-club data-home-href="../../index.html#/games" data-home-label="Back to Zone">
+    <noscript><p style="color:#fff;font-family:sans-serif;padding:24px">The arcade needs JavaScript turned on to play.</p></noscript>
+  </div>
+
+  <!-- Order matters: core → art → games → shell (shell boots the arcade) -->
+  <script src="js/core.js?v=4"></script>
+  <script src="js/art.js?v=4"></script>
+  <script src="js/games/memory.js?v=4"></script>
+  <script src="js/games/dots.js?v=4"></script>
+  <script src="js/games/tictac.js?v=4"></script>
+  <script src="js/games/golf.js?v=4"></script>
+  <script src="js/games/racers.js?v=4"></script>
+  <script src="js/games/reflex.js?v=4"></script>
+  <script src="js/games/clash.js?v=4"></script>
+  <script src="js/games/jump.js?v=4"></script>
+  <script src="js/games/hippos.js?v=4"></script>
+  <script src="js/games/skewer.js?v=4"></script>
+  <script src="js/games/paint.js?v=4"></script>
+  <script src="js/games/darts.js?v=4"></script>
+  <script src="js/games/snake.js?v=4"></script>
+  <script src="js/games/math.js?v=4"></script>
+  <script src="js/shell.js?v=5"></script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="259" viewBox="0 0 120 130" role="img" aria-label="Pip, Focused"><style>
+      .pip-ink{stroke:#3a2e28;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.pip-thin{stroke-width:2}
+      .pip-fill{fill:#ffe1a8}.pip-leaf{fill:#c9cba3}.pip-eye,.pip-mouth{fill:#3a2e28}.pip-cheek{fill:#e26d5c;opacity:0.45}.pip-blush{opacity:.65}
+      .pip-shine{fill:#fffaf1}.pip-page{fill:#fffaf1}.pip-heart{fill:#e26d5c;stroke:#3a2e28;stroke-width:1.6}.pip-tongue{fill:#e9978a}
+      .pip-tear,.pip-sweat{fill:#9ccbe0;stroke:#3a2e28;stroke-width:1.2}.pip-dots circle{fill:rgba(74,58,49,.55)}.pip-starfill,.pip-spark{fill:#ffe1a8;stroke:#3a2e28;stroke-width:1.2}
+      .pip-zzz text{font-family:'Comic Sans MS',cursive;font-size:16px;fill:rgba(74,58,49,.55);font-weight:700}.pip-boil-b{opacity:0}
+      .pip-body,.pip-sprout,.pip-wave{transform-box:fill-box;transform-origin:50% 100%}.pip-wave{transform-origin:0 100%}.pip-eyes{transform-box:fill-box;transform-origin:center}
+      .pip-body{animation:b 4.2s ease-in-out infinite}.pip-eyes{animation:k 5.6s infinite}.pip-sprout{animation:s 3.6s ease-in-out infinite}.pip-wave{animation:w 2.4s ease-in-out infinite}
+      .pip-boil-a{animation:ba .9s steps(1) infinite}.pip-boil-b{animation:bb .9s steps(1) infinite}
+      @keyframes b{50%{transform:scale(1.012,1.03)}}@keyframes k{0%,92%,100%{transform:scaleY(1)}94%{transform:scaleY(.1)}}
+      @keyframes s{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}@keyframes w{0%,60%,100%{transform:rotate(0)}15%{transform:rotate(-16deg)}30%{transform:rotate(8deg)}45%{transform:rotate(-12deg)}}
+      @keyframes ba{0%{opacity:1}50%{opacity:0}}@keyframes bb{0%{opacity:0}50%{opacity:1}}
+    </style>
+      <g class="pip-sprout"><path d="M60 41C59 31 61 25 60 17" class="pip-ink" fill="none"/>
+        <path d="M60 25C53 17 46 19 47 24c4 3 9 3 13 1z" class="pip-leaf pip-ink"/>
+        <path d="M60 20c6-8 14-7 13-2-4 4-9 4-13 2z" class="pip-leaf pip-ink"/></g>
+      <g class="pip-body">
+        <ellipse cx="46" cy="109" rx="9" ry="5" class="pip-fill pip-ink"/><ellipse cx="74" cy="109" rx="9" ry="5" class="pip-fill pip-ink"/>
+        <path d="M60 40C66.7 39.9 74.4 42 80.1 45.3C85.8 48.6 91.3 54.1 94.1 59.7C96.9 65.3 97.8 72.6 97 78.9C96.2 85.1 93.6 92.6 89.1 97.2C84.7 101.8 77 105.5 70.5 106.8C64 108.1 56.5 106.7 50.1 105C43.7 103.2 36.5 100.7 31.9 96.3C27.4 92 23.8 85 22.9 78.9C22 72.8 23.7 65.5 26.5 60C29.4 54.4 34.5 48.8 40 45.5C45.6 42.1 53.3 40 60 40Z" class="pip-fill pip-ink pip-boil-a"/><path d="M60 41.7C66.6 42 73.3 43.9 79 46.9C84.7 49.9 91.4 54.3 94.2 59.7C97 65 96.9 72.7 95.8 78.7C94.6 84.7 91.7 91.3 87.4 95.8C83.1 100.3 76.4 103.7 70.1 105.5C63.8 107.3 56.2 108 49.6 106.7C43 105.3 35.1 102.1 30.5 97.5C25.9 92.9 22.3 85.2 21.9 79C21.6 72.9 25.4 66.4 28.3 60.7C31.3 55 34.2 47.9 39.5 44.7C44.8 41.5 53.4 41.3 60 41.7Z" class="pip-fill pip-ink pip-boil-b"/>
+        <ellipse cx="37" cy="80" rx="5.5" ry="3.2" class="pip-cheek"/><ellipse cx="83" cy="80" rx="5.5" ry="3.2" class="pip-cheek"/><g class="pip-eyes"><ellipse cx="47" cy="69" rx="4" ry="5" class="pip-eye"/><ellipse cx="73" cy="69" rx="4" ry="5" class="pip-eye"/></g><path d="M40 59l11 3M80 59l-11 3" class="pip-ink" fill="none"/><path d="M55 82q5 2 10 0" class="pip-ink" fill="none"/><path d="M26 82q-7 5-5 11M94 82q7 5 5 11" class="pip-ink" fill="none"/><path class="pip-sweat" d="M90 50c-2 4-3 6-1 7.5 2 1.2 4-.6 3.2-2.8z"/>
+      </g></svg>

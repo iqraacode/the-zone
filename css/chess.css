@@ -1,0 +1,201 @@
+/* Zone — the chess room. Deliberately monochrome: black, white and greys only, like the reference board. */
+
+body[data-page="chess"], .cz-overlay {
+  --cz-bg: #ffffff; --cz-ink: #111111; --cz-dim: #8a8a8a; --cz-line: #e6e6e6; --cz-soft: #f4f4f4;
+  --cz-light: #ffffff; --cz-dark: #e4e4e4; --cz-coord: #c4c4c4; --cz-last: rgba(0, 0, 0, .07); --cz-dot: rgba(0, 0, 0, .22);
+  background: var(--cz-bg);
+}
+html[data-theme="dark"] body[data-page="chess"], html[data-theme="dark"] .cz-overlay {
+  --cz-bg: #121212; --cz-ink: #f2f2f2; --cz-dim: #8f8f8f; --cz-line: #2a2a2a; --cz-soft: #1c1c1c;
+}
+body[data-page="chess"]::before { display: none; }
+body[data-page="chess"] .topbar { background: var(--cz-bg); border-bottom-color: var(--cz-line); }
+body[data-page="chess"] .view { padding-top: 0; }
+
+.chess-page { position: relative; max-width: 1180px; margin: 0 auto; color: var(--cz-ink); font-family: var(--font-ui); }
+.cz-top { display: none; justify-content: space-between; align-items: center; padding: 6px 0 0; }
+.cz-ic { color: var(--cz-ink); width: 46px; height: 46px; }
+.cz-ic .ico { width: 28px; height: 28px; stroke-width: 2.1; }
+.cz-ic:hover { background: var(--cz-soft); color: var(--cz-ink); }
+
+.cz-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px; align-items: start; padding-top: 18px; }
+.cz-main { display: flex; flex-direction: column; align-items: stretch; max-width: 720px; width: 100%; margin: 0 auto; }
+.cz-badge-row { display: flex; justify-content: flex-end; min-height: 34px; }
+.cz-badge { display: inline-grid; place-items: center; min-width: 34px; height: 32px; padding: 0 8px; border-radius: 8px; background: var(--cz-ink); color: var(--cz-bg); font-weight: 600; font-size: .95rem; font-variant-numeric: tabular-nums; }
+
+.cz-player { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 6px 0; }
+.cz-opp { margin-top: 4px; }
+.cz-av { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 10px; font-weight: 700; font-size: 1.15rem; }
+.cz-av-solid { background: var(--cz-ink); color: var(--cz-bg); }
+.cz-av-line { border: 2.5px solid var(--cz-ink); color: var(--cz-ink); font-size: .92rem; letter-spacing: -.01em; }
+.cz-pinfo { display: flex; flex-direction: column; min-width: 0; gap: 2px; }
+.cz-name { font-weight: 600; font-size: 1.22rem; line-height: 1.2; letter-spacing: -.01em; }
+.cz-dim { color: var(--cz-dim); font-weight: 500; }
+.cz-name b { font-weight: 700; }
+.cz-think { color: var(--cz-dim); font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+.cz-scrib { display: inline-block; width: 44px; height: 14px; vertical-align: middle; }
+.cz-scrib .doodle { width: 44px; height: 14px; }
+.cz-scrib .d-ink { stroke: var(--cz-ink) !important; stroke-width: 3; }
+.cz-caps { display: flex; align-items: center; min-height: 18px; flex-wrap: wrap; }
+.cz-cap { width: 18px; height: 18px; margin-right: -4px; }
+.cz-cap .pc { width: 18px; height: 18px; }
+.cz-adv { margin-left: 10px; font-size: .78rem; color: var(--cz-dim); font-weight: 600; }
+
+/* board */
+.cz-board-wrap { position: relative; width: min(100%, calc(100vh - 360px), 640px); min-width: 260px; aspect-ratio: 1; margin: 4px auto; user-select: none; -webkit-user-select: none; }
+.cz-board { display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); width: 100%; height: 100%; touch-action: none; }
+.sq { position: relative; display: block; padding: 0; border: 0; border-radius: 0; background: var(--cz-light); cursor: pointer; }
+.sq.d { background: var(--cz-dark); }
+.sq:focus-visible { outline: 3px solid var(--cz-ink); outline-offset: -3px; border-radius: 0; z-index: 3; }
+.sq.last::before { content: ''; position: absolute; inset: 0; background: var(--cz-last); }
+.co { position: absolute; font-size: clamp(7px, 1.4vw, 10px); font-weight: 500; color: var(--cz-coord); line-height: 1; pointer-events: none; z-index: 1; }
+.co-r { left: 3px; top: 3px; }
+.co-f { right: 3px; bottom: 3px; }
+.pw { position: absolute; inset: 0; display: grid; place-items: center; z-index: 2; will-change: transform; pointer-events: none; }
+.pw.dragging { z-index: 20; transition: none !important; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .18)); }
+.pc { width: 94%; height: 94%; overflow: visible; }
+.sq.dot::after { content: ''; position: absolute; left: 50%; top: 50%; width: 26%; height: 26%; margin: -13% 0 0 -13%; border-radius: 50%; background: var(--cz-dot); z-index: 3; pointer-events: none; }
+.sq.cap::after { content: ''; position: absolute; inset: 6%; border-radius: 50%; border: 3px solid var(--cz-dot); z-index: 3; pointer-events: none; }
+.sq.sel { background-image: linear-gradient(rgba(0, 0, 0, .06), rgba(0, 0, 0, .06)); }
+.sq.chk { background-image: repeating-linear-gradient(-45deg, rgba(0, 0, 0, .14) 0 2px, transparent 2px 7px); }
+
+/* pieces: classic (white outlined, black filled with white detail lines) */
+.pc .pc-body > * { stroke: #111; stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.pc-w .pc-body > * { fill: #fff; }
+.pc-b .pc-body > * { fill: #111; }
+.pc .pc-detail { fill: none; stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; }
+.pc-w .pc-detail { stroke: #111; }
+.pc-b .pc-detail { stroke: #fff; }
+.pc-sketch .pc-body > * { stroke-width: 1.9; }
+.pc-sketch.pc-b .pc-body > * { fill: url(#hatch); }
+.pc-sketch.pc-b .pc-detail { stroke: #111; }
+.pc-sketch { transform: rotate(-2deg); }
+
+/* annotations (hand-drawn) */
+.cz-annot { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 4; overflow: visible; }
+.an-ring { fill: none; stroke: var(--cz-ink); stroke-width: 3.5; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .35s var(--ease-out) forwards; opacity: .85; }
+.an-check { fill: none; stroke: #111; stroke-width: 5; stroke-linecap: round; opacity: .9; }
+.an-check[pathLength] { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .4s var(--ease-out) forwards; }
+
+/* board styles (all monochrome) */
+.chess-page[data-board="graphite"] { --cz-light: #f3f3f3; --cz-dark: #bdbdbd; --cz-coord: #8c8c8c; }
+.chess-page[data-board="ink"] { --cz-light: #ffffff; --cz-dark: #ffffff; }
+.chess-page[data-board="ink"] .cz-board { outline: 2px solid #111; }
+.chess-page[data-board="ink"] .sq.d { background: repeating-linear-gradient(45deg, #fff 0 3px, #d6d6d6 3px 4px); }
+html[data-theme="dark"] .chess-page[data-board="ink"] .cz-board { outline-color: #f2f2f2; }
+
+/* toolbar */
+.cz-toolbar { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--cz-line); }
+.cz-toolbar button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; color: var(--cz-ink); font-weight: 500; font-size: .95rem; border-radius: 12px; transition: background .2s; }
+.cz-toolbar button:hover:not(:disabled) { background: var(--cz-soft); }
+.cz-toolbar .ico { width: 30px; height: 30px; stroke-width: 2.1; }
+.cz-toolbar button:disabled, .cz-toolbar button.is-off { color: #bdbdbd; }
+
+/* side panel */
+.cz-side { position: sticky; top: calc(var(--topbar-h) + 18px); border: 1px solid var(--cz-line); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; max-height: calc(100vh - var(--topbar-h) - 60px); background: var(--cz-bg); margin-top: 62px; }
+.cz-side-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.cz-side-head h2 { font-size: 1.05rem; }
+.cz-result { font-size: .82rem; color: var(--cz-dim); }
+.cz-moves { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; font-variant-numeric: tabular-nums; }
+.cz-moves li { display: grid; grid-template-columns: 38px 1fr 1fr; gap: 4px; padding: 5px 6px; border-radius: 8px; font-size: .95rem; }
+.cz-moves li:nth-child(odd) { background: var(--cz-soft); }
+.cz-moves .mn { color: var(--cz-dim); }
+.cz-moves .mv { font-weight: 500; }
+.cz-moves .mv.cur { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.cz-moves .cz-none { display: block; color: var(--cz-dim); background: none; font-size: .88rem; }
+.cz-side-foot { display: flex; flex-direction: column; gap: 4px; padding-top: 12px; margin-top: 10px; border-top: 1px solid var(--cz-line); }
+.cz-link { display: inline-flex; align-items: center; gap: 10px; padding: 8px 6px; border-radius: 10px; color: var(--cz-ink); font-size: .92rem; }
+.cz-link:hover { background: var(--cz-soft); }
+.cz-link .ico { width: 19px; height: 19px; }
+
+/* drawer + sheet */
+.cz-drawer, .cz-sheet { position: fixed; inset: 0; z-index: 75; background: rgba(0, 0, 0, .28); animation: fade .2s; }
+.cz-drawer[hidden], .cz-sheet[hidden] { display: none; }
+.cz-drawer-panel { position: absolute; left: 0; top: 0; bottom: 0; width: min(340px, 88vw); background: var(--cz-bg); color: var(--cz-ink); padding: 18px 18px 24px; overflow-y: auto; box-shadow: 10px 0 40px rgba(0, 0, 0, .18); animation: slide-in .25s var(--ease-out); display: flex; flex-direction: column; gap: 14px; }
+@keyframes slide-in { from { transform: translateX(-100%); } }
+.cz-dh { display: flex; justify-content: space-between; align-items: center; }
+.cz-dh h2 { font-size: 1.3rem; }
+.cz-dh .icon-btn { color: var(--cz-ink); }
+.cz-group { display: flex; flex-direction: column; gap: 6px; }
+.cz-group > span { font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--cz-dim); font-weight: 600; }
+.cz-group > div { display: flex; gap: 6px; flex-wrap: wrap; }
+.cz-group.off { opacity: .4; pointer-events: none; }
+.cz-opt { min-height: 38px; padding: 0 14px; border-radius: 10px; border: 1.5px solid var(--cz-line); color: var(--cz-ink); font-size: .9rem; font-weight: 500; }
+.cz-opt.on { background: var(--cz-ink); color: var(--cz-bg); border-color: var(--cz-ink); }
+.cz-primary { min-height: 46px; border-radius: 12px; background: var(--cz-ink); color: var(--cz-bg); font-weight: 600; }
+.cz-drawer hr { border: 0; border-top: 1px solid var(--cz-line); width: 100%; margin: 4px 0; }
+.cz-sheet-panel { position: absolute; left: 0; right: 0; bottom: 0; max-height: 70vh; background: var(--cz-bg); color: var(--cz-ink); border-radius: 20px 20px 0 0; padding: 16px 18px calc(20px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; animation: sheet-up .25s var(--ease-out); }
+@keyframes sheet-up { from { transform: translateY(100%); } }
+.cz-sheet-panel .cz-moves { margin-top: 8px; }
+
+/* modals on the chess page stay monochrome */
+body[data-page="chess"] dialog.modal { background: var(--cz-bg); color: var(--cz-ink); }
+body[data-page="chess"] dialog.modal .btn-primary { background: var(--cz-ink); color: var(--cz-bg); box-shadow: none; }
+body[data-page="chess"] dialog.modal .btn-ghost { background: transparent; color: var(--cz-ink); border-color: var(--cz-line); }
+body[data-page="chess"] dialog.modal .btn-danger { color: var(--cz-ink); border-color: var(--cz-ink); }
+body[data-page="chess"] dialog.modal p { color: var(--cz-dim); }
+body[data-page="chess"] .toast { background: var(--cz-ink); color: var(--cz-bg); }
+.rules ul { padding-left: 1.1em; margin: 0 0 12px; } .rules li { margin: 4px 0; color: var(--cz-dim); } .rules li b, .rules p b { color: var(--cz-ink); }
+.cz-promo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 6px 0 10px; }
+.cz-promo button { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 4px; border-radius: 12px; border: 1.5px solid var(--cz-line); font-size: .78rem; text-transform: capitalize; }
+.cz-promo button:hover { border-color: var(--cz-ink); }
+.cz-promo .pc { width: 52px; height: 52px; }
+.cz-over { text-align: center; }
+.cz-over-scrib { width: 180px; height: 26px; margin: 0 auto; }
+.cz-over-scrib path { fill: none; stroke: var(--cz-ink); stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .6s var(--ease-out) forwards; }
+.cz-over-res { font-size: 1.15rem; font-weight: 600; color: var(--cz-ink) !important; margin: 6px 0; }
+
+/* ---------- responsive: mobile mirrors the reference screenshot ---------- */
+@media (max-width: 1000px) {
+  .cz-layout { grid-template-columns: 1fr; gap: 0; padding-top: 0; }
+  .cz-side { display: none; }
+  .cz-top { display: flex; }
+  .cz-main { max-width: 560px; }
+  .cz-opp { margin-top: 20px; }
+  .cz-board-wrap { width: min(100%, calc(100vh - 330px)); }
+}
+@media (max-width: 760px) {
+  body[data-page="chess"] .topbar { display: none; }
+  body[data-page="chess"] .view { padding-left: 16px; padding-right: 16px; }
+  .cz-top { padding-top: max(6px, env(safe-area-inset-top)); margin: 0 -8px; }
+  .cz-badge-row { margin-top: 2px; }
+  .cz-opp { margin-top: 34px; }
+  .cz-av { width: 40px; height: 40px; font-size: 1.02rem; border-radius: 9px; }
+  .cz-av-line { font-size: .8rem; }
+  .cz-name { font-size: 1.06rem; }
+  .cz-board-wrap { width: min(calc(100% - 32px), calc(100vh - 360px)); }
+  .cz-toolbar { margin: 18px -16px 0; padding: 12px 0 0; }
+  .cz-toolbar button { font-size: .8rem; }
+  .cz-toolbar .ico { width: 26px; height: 26px; }
+}
+@media (max-height: 640px) and (max-width: 760px) { .cz-board-wrap { width: min(calc(100% - 32px), 300px); } .cz-opp { margin-top: 10px; } }
+/* the app's own nav goes monochrome inside the chess room */
+body[data-page="chess"] .bottom-nav { background: var(--cz-bg); border-top-color: var(--cz-line); }
+body[data-page="chess"] .bn-item { color: var(--cz-dim); }
+body[data-page="chess"] .bn-item.active, body[data-page="chess"] .bn-item.active .ico { color: var(--cz-ink); }
+body[data-page="chess"] .bn-item.active::before { background: var(--cz-soft); }
+body[data-page="chess"] .nav-item.active .ico { color: var(--cz-ink); }
+body[data-page="chess"] .mini-player { background: var(--cz-bg); border-top-color: var(--cz-line); color: var(--cz-ink); }
+body[data-page="chess"] .mini-player .mp-play { background: var(--cz-ink); color: var(--cz-bg); }
+body[data-page="chess"] .mini-player .mp-seek span { background: var(--cz-ink); }
+body[data-page="chess"] .mini-player .track-art { filter: grayscale(1); }
+body[data-page="chess"] .mini-player .icon-btn, body[data-page="chess"] .mini-player small { color: var(--cz-dim); }
+
+/* ---------- cute piece set (default): round, chunky, cel-shaded, outlines boil like hand-drawn frames ---------- */
+.pc.pc-cute { overflow: visible; transition: transform .18s cubic-bezier(.3, .7, .2, 1.3); }
+.pc.pc-cute .pc-body > * { fill: inherit; stroke: #161616; stroke-width: 2.3; stroke-linejoin: round; stroke-linecap: round; }
+.pc.pc-cute .pc-body > .pc-line { fill: none; stroke-width: 1.8; }
+.pc.pc-cute .pc-body > .pc-eye, .pc.pc-cute .pc-body > .pc-dot { fill: #161616; stroke: none; }
+.pc.pc-cute.pc-b .pc-body > .pc-eye { fill: #f4f4f4; }
+.pc.pc-cute.pc-b .pc-body > .pc-line { stroke: #161616; }
+.pc-cute .pc-shadow { fill: rgba(0, 0, 0, .14); stroke: none; }
+.pc-cute .pc-body { animation: pc-boil .44s steps(1) infinite; }
+@keyframes pc-boil { 0% { filter: url(#nook-boil-a); } 50% { filter: url(#nook-boil-b); } }
+.cz-cap .pc-cute .pc-body, .cz-cap .pc-shadow { animation: none; filter: none; }
+.cz-cap .pc-shadow { display: none; }
+/* picked up: the piece lifts a little; on landing it squashes and settles */
+.sq.sel .pc.pc-cute { transform: translateY(-8%) scale(1.07); }
+.pw.dragging .pc.pc-cute { transform: scale(1.1); }
+.pw.landed .pc.pc-cute { animation: pc-land .36s ease-out; }
+@keyframes pc-land { 0% { transform: scale(1.14, .84) translateY(5%); } 45% { transform: scale(.95, 1.07) translateY(-2%); } 100% { transform: none; } }
+html[data-motion="calm"] .pc-cute .pc-body { animation: none; }

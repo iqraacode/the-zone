@@ -1,0 +1,352 @@
+/* Zone — "sketchbook" layer.
+   The app reads like a well-used sketchbook: things are pasted onto dotted paper, outlined in marker ink,
+   held down with tape, and the place you are is marked with a highlighter. Loaded last; overrides the base kit.
+   Chess (monochrome) and Mochi (dark jar) keep their own looks. */
+
+:root {
+  --font-ui: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Kalam', 'Atkinson Hyperlegible', cursive;
+  --font-hand: 'Kalam', cursive;
+  /* uneven corners, like a box drawn by hand — smaller wobble for small things */
+  --r-paper: 16px 6px 18px 8px / 8px 17px 6px 15px;
+  --r-btn: 12px 5px 13px 6px / 6px 12px 5px 13px;
+  --r-tiny: 9px 4px 10px 5px / 5px 9px 4px 10px;
+}
+html[data-theme="light"] {
+  --ink-line: rgba(58, 46, 38, .82);
+  --ink-faint: rgba(58, 46, 38, .28);
+  --hard: rgba(90, 70, 52, .2);
+  --hl: rgba(255, 207, 110, .62);
+  --tape: rgba(255, 252, 240, .62);
+  --dots: rgba(90, 70, 52, .13);
+  --note-1: #fff0c4; --note-2: #e6e8cb; --note-3: #f9d5ca; --note-4: #f2e6d4; --note-5: #ecd6bd;
+}
+html[data-theme="dark"] {
+  --ink-line: rgba(240, 217, 196, .62);
+  --ink-faint: rgba(240, 217, 196, .22);
+  --hard: rgba(0, 0, 0, .38);
+  --hl: rgba(217, 155, 127, .38);
+  --tape: rgba(255, 245, 230, .16);
+  --dots: rgba(240, 217, 196, .07);
+  --note-1: #3b4846; --note-2: #33464a; --note-3: #4a3c3d; --note-4: #3c3f4c; --note-5: #47403a;
+}
+
+/* ---------- page: dotted sketchbook paper ---------- */
+body { background-image: radial-gradient(var(--dots) 1.1px, transparent 1.3px); background-size: 22px 22px; background-attachment: fixed; }
+body[data-page="chess"] { background-image: none; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; letter-spacing: 0; }
+h1 { font-size: clamp(2rem, 1.4rem + 2vw, 2.9rem); line-height: 1.1; }
+.sec-head h2 { font-size: 1.6rem; }
+.chess-page, .chess-page h1, .chess-page h2, .chess-page h3, body[data-page="chess"] dialog.modal, body[data-page="chess"] dialog.modal * { font-family: 'Lexend', system-ui, sans-serif; }
+.mochi, .mochi * { font-family: "Righteous", var(--font-ui); }
+
+.view.enter > * { animation: none; }   /* no generic fade-up on every page */
+.sec-scribble { display: none; }
+
+/* ---------- paper surfaces ---------- */
+.card, .panel, .item-card, .game-card, .read-stats, .track-list, .queue, .side-card, .pl-tile, .bm-list a, .bm-list li > button:first-child,
+.text-settings, .ambient-panel, .search-panel, dialog.modal, .set-card, .v-feature, .now-playing, .pip-card, .slot-empty {
+  background: var(--paper); border: 1.6px solid var(--ink-line); border-radius: var(--r-paper); box-shadow: 3px 4px 0 var(--hard);
+}
+.now-playing, .hero { background-image: none; }
+.read-stats { gap: 0; } .read-stats > div { background: transparent; border-right: 1.5px dashed var(--ink-faint); } .read-stats > div:last-child { border-right: 0; }
+.track-row { border-bottom: 1.5px dashed var(--ink-faint); }
+.item-card:hover, .game-card:hover { transform: translate(-1px, -2px); box-shadow: 5px 6px 0 var(--hard); }
+.item-card:active, .game-card:active { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--hard); }
+.empty { border: 1.8px dashed var(--ink-faint); border-radius: var(--r-paper); background: transparent; }
+
+/* the hero is a big sheet taped to the page */
+.hero { position: relative; overflow: visible; background-color: var(--paper); }
+.hero::before, .hero::after, .quick-card::before, .bc-cover::before, .pl-tile::before {
+  content: ''; position: absolute; width: 74px; height: 20px; background: var(--tape); pointer-events: none; z-index: 2;
+  clip-path: polygon(3% 0, 97% 4%, 100% 30%, 96% 55%, 100% 80%, 95% 100%, 4% 96%, 0 70%, 4% 45%, 0 20%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+.hero::before { top: -10px; left: 36px; transform: rotate(-5deg); }
+.hero::after { top: -8px; right: 44px; transform: rotate(4deg); }
+
+/* ---------- quick access: sticky notes ---------- */
+.quick-grid { gap: 22px 18px; }
+.quick-card { border: 0; border-radius: 2px 3px 6px 2px; box-shadow: 0 10px 14px -12px rgba(40, 28, 18, .45), 0 1px 0 rgba(0, 0, 0, .04); background: var(--note-1); transition: transform .3s cubic-bezier(.3, .7, .2, 1.3); }
+.quick-card:nth-child(1) { background: var(--note-1); transform: rotate(-1.6deg); }
+.quick-card:nth-child(2) { background: var(--note-2); transform: rotate(1.2deg); }
+.quick-card:nth-child(3) { background: var(--note-3); transform: rotate(-.7deg); }
+.quick-card:nth-child(4) { background: var(--note-4); transform: rotate(1.8deg); }
+.quick-card:nth-child(5) { background: var(--note-5); transform: rotate(-1.2deg); }
+.quick-card:hover, .quick-card:focus-visible { transform: rotate(0) translateY(-3px); box-shadow: 0 16px 18px -14px rgba(40, 28, 18, .5); }
+.quick-card::before { top: -9px; left: 50%; margin-left: -37px; transform: rotate(-3deg); }
+.quick-card .sketch-ring { display: none; }
+.qc-txt b { font-family: var(--font-display); font-size: 1.35rem; font-weight: 700; }
+.qc-txt small { color: var(--ink-2); }
+
+/* book covers: taped in at one corner */
+.bc-cover::before { width: 46px; height: 16px; top: -7px; left: -10px; transform: rotate(-32deg); }
+.bc-cover { box-shadow: 3px 4px 0 var(--hard); border-radius: 3px 6px 6px 3px; }
+.bc-link:hover .bc-cover { transform: rotate(-1.5deg); box-shadow: 5px 6px 0 var(--hard); }
+.pl-tile { position: relative; } .pl-tile::before { top: -9px; left: 18px; width: 50px; transform: rotate(-6deg); }
+
+/* ---------- controls ---------- */
+.btn { border: 1.8px solid var(--ink-line); border-radius: var(--r-btn); font-weight: 700; box-shadow: 2px 3px 0 var(--hard); transition: transform .12s, box-shadow .12s, background .2s; }
+.btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 4px 0 var(--hard); filter: none; }
+.btn:active { transform: translate(2px, 3px); box-shadow: 0 0 0 var(--hard); }
+.btn-primary { box-shadow: 2px 3px 0 var(--ink-line); }
+.btn-primary:hover { box-shadow: 3px 4px 0 var(--ink-line); }
+.btn-ghost { background: var(--paper); }
+.btn-sketch::after { display: none; }
+.icon-btn { border-radius: var(--r-tiny); }
+.icon-btn:hover { background: var(--accent-soft); }
+.input, .select, textarea.input, .search-trigger, .hero-search, .sort-sel select {
+  background: var(--paper); border: 1.6px solid var(--ink-line); border-radius: var(--r-btn); box-shadow: inset 0 2px 0 rgba(0, 0, 0, .03);
+}
+.search-box .input { border-radius: var(--r-btn); }
+.search-trigger:hover, .hero-search:hover { box-shadow: 2px 3px 0 var(--hard); border-color: var(--ink-line); }
+.input:focus, .select:focus, textarea.input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-soft); }
+.chip { position: relative; background: var(--paper); border: 1.4px solid var(--ink-faint); border-radius: var(--r-btn); color: var(--ink-2); }
+.chip:hover { border-color: var(--ink-line); color: var(--ink); }
+.chip.on { background: var(--paper); color: var(--ink); border: 2px solid var(--ink-line); font-weight: 700; transform: rotate(-1.5deg); box-shadow: 2px 2px 0 var(--hard); }
+.seg { background: transparent; border: 1.6px solid var(--ink-line); border-radius: var(--r-btn); }
+.seg-btn.on { background: var(--paper); box-shadow: 0 0 0 1.6px var(--ink-line); border-radius: var(--r-tiny); font-weight: 700; }
+.progress { background: transparent; border: 1.3px solid var(--ink-faint); height: 8px; border-radius: 6px 3px 6px 4px; }
+.progress span { background: repeating-linear-gradient(-45deg, var(--accent) 0 5px, color-mix(in srgb, var(--accent) 70%, var(--paper)) 5px 8px); }
+.fav-btn.on .ico { fill: var(--accent); }
+
+/* labels in sentence case, written by hand — not tracked-out caps */
+.badge, .ic-kicker, .sr-group h3 { text-transform: none; letter-spacing: 0; font-family: var(--font-hand); font-weight: 400; }
+.badge { font-size: .86rem; background: transparent; border: 1.2px dashed var(--ink-faint); padding: 0 8px; border-radius: var(--r-tiny); color: var(--ink-2); }
+.ic-kicker { font-size: .92rem; color: var(--ink-3); }
+.sr-group h3 { font-size: 1.05rem; color: var(--ink-2); }
+.sample-note { font-family: var(--font-hand); font-size: .98rem; border: 0; background: none; padding: 0; color: var(--ink-2); }
+.link-more { font-family: var(--font-hand); font-size: 1.1rem; font-weight: 700; color: var(--ink-2); text-decoration: underline; text-decoration-style: wavy; text-decoration-thickness: 1px; text-underline-offset: 5px; text-decoration-color: var(--accent); }
+.link-more .ico { display: none; }
+.hero-kicker { display: block; margin-bottom: 2px; }
+.hero-kicker, .vf-kicker, .np-kicker, .rt-kicker, .focus-label { font-family: var(--font-hand); }
+.clock-time { font-family: var(--font-display); font-weight: 700; }
+
+/* ---------- navigation: a highlighter marks where you are ---------- */
+.sidebar { background: var(--bg-2); border-right: 1.6px solid var(--ink-line); box-shadow: inset -10px 0 0 -8px color-mix(in srgb, var(--coral) 45%, transparent); }   /* notebook margin line */
+.brand-text b { font-family: var(--font-display); font-weight: 700; font-size: 1.7rem; }
+.nav-item { font-weight: 400; color: var(--ink-2); font-size: 1.02rem; }
+.nav-item:hover { background: transparent; color: var(--ink); }
+.nav-item.active { background: transparent; box-shadow: none; color: var(--ink); font-weight: 700; }
+.nav-item.active .scribble-under path { stroke: var(--ink-line); stroke-width: 2.6; }
+.nav-item.active .ico { color: var(--ink); }
+@media (max-width: 1100px) {
+  .nav-item.active::after { display: none; }
+  .nav-item.active { background: transparent; border: 1.8px solid var(--ink-line); border-radius: 50% 44% 52% 40% / 46% 52% 44% 54%; }
+  .nav-item.active .nav-label { background: var(--ink); }
+}
+.topbar { background: color-mix(in srgb, var(--bg) 92%, transparent); border-bottom: 1.5px dashed var(--ink-faint); }
+@media (max-width: 760px) {
+  .bottom-nav { border-top: 1.6px solid var(--ink-line); background: var(--paper); }
+  .bn-item.active::before { background: transparent; border: 1.8px solid var(--ink-line); border-radius: 50% 42% 55% 40% / 48% 55% 42% 52%; transform: rotate(-4deg); }
+  .bn-item.active .ico { color: var(--ink); }
+}
+
+/* ---------- small paper bits ---------- */
+.toast { background: var(--paper); color: var(--ink); border: 1.6px solid var(--ink-line); border-radius: var(--r-btn); box-shadow: 3px 4px 0 var(--hard); transform: rotate(-.8deg); font-weight: 700; }
+.toast-btn { color: var(--accent-strong); text-decoration: underline; }
+dialog.modal { box-shadow: 6px 8px 0 var(--hard); }
+.modal-title { font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; }
+.mini-player { background: var(--paper); border-top: 1.6px solid var(--ink-line); box-shadow: 0 -3px 0 var(--hard); }
+.mp-play, .np-play { border: 1.8px solid var(--ink-line); box-shadow: 2px 3px 0 var(--hard); }
+.amb-item { border: 1.4px solid var(--ink-faint); border-radius: var(--r-btn); }
+.amb-item.on { background: var(--accent-soft); border-color: var(--ink-line); }
+.vc-thumb, .vf-img, .un-thumb, .pl-thumb, .ic-thumb { border: 1.6px solid var(--ink-line); border-radius: var(--r-tiny); box-shadow: 3px 4px 0 var(--hard); }
+.v-feature .vf-img { border: 0; border-right: 1.6px solid var(--ink-line); box-shadow: none; border-radius: 0; }
+.player-frame { border: 2px solid var(--ink-line); border-radius: var(--r-paper); box-shadow: 5px 6px 0 var(--hard); }
+.ic-art { border-radius: var(--r-tiny); }
+.gc-art { background: transparent; border: 1.4px dashed var(--ink-faint); border-radius: var(--r-paper); }
+.game-card .sketch-ring { display: none; }
+.cel-card { border: 1.8px solid var(--ink-line); box-shadow: 5px 6px 0 var(--hard); }
+.focus-time { font-family: var(--font-display); font-weight: 700; }
+.reader-text p { text-wrap: pretty; }
+
+/* =====================================================================
+   Living lines — everything drawn keeps moving a little, like the rain.
+   ===================================================================== */
+
+/* 1. "Boil": outlines hop between two slightly different hand-drawn shapes (classic 2-frame line boil).
+      steps() means only two repaints per cycle, so it stays cheap. */
+@keyframes boil { 0% { border-radius: 16px 6px 18px 8px / 8px 17px 6px 15px; } 50% { border-radius: 14px 9px 15px 6px / 10px 14px 8px 17px; } }
+@keyframes boil-sm { 0% { border-radius: 12px 5px 13px 6px / 6px 12px 5px 13px; } 50% { border-radius: 10px 7px 11px 4px / 8px 10px 7px 11px; } }
+.card, .panel, .item-card, .game-card, .read-stats, .track-list, .queue, .side-card, .pl-tile, .text-settings, .ambient-panel,
+.search-panel, dialog.modal, .set-card, .v-feature, .now-playing, .empty, .player-frame, .slot-empty {
+  animation: boil 1.4s steps(1) infinite;
+}
+.input, .search-trigger, .hero-search, .chip, .seg, .badge, .toast, .vc-thumb, .un-thumb, .ic-thumb, .amb-item { animation: boil-sm 1.6s steps(1) infinite; }
+/* offset the boil so the page doesn't tick in unison */
+.item-card:nth-child(3n+1), .game-card:nth-child(3n+1), .chip:nth-child(3n+1) { animation-delay: -.5s; }
+.item-card:nth-child(3n+2), .game-card:nth-child(3n+2), .chip:nth-child(3n+2) { animation-delay: -1.1s; }
+
+/* 2. Doodles loop on their own (with rests, so it's calm), not only on hover */
+.d-page { animation: page-flip-loop 5s ease-in-out infinite; }
+@keyframes page-flip-loop { 0%, 78%, 100% { transform: scaleX(1); } 86% { transform: scaleX(.12); } }
+.d-play { transform-box: fill-box; transform-origin: center; animation: play-pulse 3.2s ease-in-out infinite; }
+@keyframes play-pulse { 0%, 70%, 100% { transform: scale(1); } 80% { transform: scale(1.14) translateX(1px); } 90% { transform: scale(.96); } }
+.d-controller { transform-origin: 50% 60%; animation: wiggle-loop 3.6s ease-in-out infinite; }
+@keyframes wiggle-loop { 0%, 72%, 100% { transform: rotate(0); } 78% { transform: rotate(-5deg); } 86% { transform: rotate(4deg); } 93% { transform: rotate(-2deg); } }
+.d-wire { animation: sway 2.8s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 100%; }
+.d-notes { opacity: 1; animation: note-float 2.6s ease-in-out infinite; }
+.d-spin { animation: spin 9s linear infinite; }
+.d-knight .d-mono, .d-knight { transform-origin: 50% 90%; }
+.d-knight { animation: knight-rock 4.4s ease-in-out infinite; }
+@keyframes knight-rock { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2.5deg) translateY(-1px); } }
+.d-trace { animation: draw-loop 4s ease-in-out infinite; }
+@keyframes draw-loop { 0% { stroke-dashoffset: 1; } 45%, 75% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+.d-bookmark, .d-mug, .d-lamp, .d-book, .d-screen, .d-film, .d-map, .d-headphones, .d-trophy, .d-cloud { animation: doodle-bob 4.8s ease-in-out infinite; }
+.d-screen { animation-delay: -1.2s; } .d-headphones { animation-delay: -2.1s; } .d-map { animation-delay: -3s; }
+@keyframes doodle-bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-2px) rotate(-1deg); } }
+.d-glow { animation: glow 4s ease-in-out infinite; }
+.d-star { animation: twinkle 3.4s ease-in-out infinite; }
+.gc-art .game-art { animation: doodle-bob 4.2s ease-in-out infinite; }
+.game-card:nth-child(2n) .game-art { animation-delay: -2s; }
+/* sticky notes breathe on the page, as if there were a draught */
+.quick-card { animation: note-flutter 6s ease-in-out infinite; }
+.quick-card:nth-child(1) { --tilt: -1.6deg; } .quick-card:nth-child(2) { --tilt: 1.2deg; animation-delay: -1.5s; }
+.quick-card:nth-child(3) { --tilt: -.7deg; animation-delay: -3s; } .quick-card:nth-child(4) { --tilt: 1.8deg; animation-delay: -.8s; }
+.quick-card:nth-child(5) { --tilt: -1.2deg; animation-delay: -4.2s; }
+@keyframes note-flutter { 0%, 100% { transform: rotate(var(--tilt, 0deg)); } 50% { transform: rotate(calc(var(--tilt, 0deg) * -0.4)) translateY(-1.5px); } }
+.quick-card:hover, .quick-card:focus-visible { animation: none; }
+/* tape strips shiver slightly */
+.hero::before, .hero::after { animation: tape-shiver 3s steps(2) infinite; }
+@keyframes tape-shiver { 50% { translate: 0 .6px; } }
+/* hand-drawn underlines redraw now and then */
+.nav-item.active .scribble-under path { animation: draw-loop 5s ease-in-out infinite; }
+/* empty-state Pips and doodles drift */
+.empty-art { animation: doodle-bob 5s ease-in-out infinite; }
+
+/* 3. (jelly keyframes kept for reference, not used on hover) */
+@keyframes jelly {
+  0% { transform: scale(1, 1); } 25% { transform: scale(1.06, .94) rotate(-1.5deg); } 45% { transform: scale(.96, 1.04) rotate(1.2deg); }
+  65% { transform: scale(1.02, .98) rotate(-.6deg); } 85% { transform: scale(.995, 1.005); } 100% { transform: scale(1, 1); }
+}
+
+/* calm mode keeps things still except responses to touch; reduced motion stops everything (base rules) */
+html[data-motion="calm"] .card, html[data-motion="calm"] .item-card, html[data-motion="calm"] .game-card, html[data-motion="calm"] .panel,
+html[data-motion="calm"] .quick-card, html[data-motion="calm"] .btn-primary, html[data-motion="calm"] .brand-pip, html[data-motion="calm"] .brand-text b,
+html[data-motion="calm"] [class*="d-"], html[data-motion="calm"] .input, html[data-motion="calm"] .chip, html[data-motion="calm"] .empty-art { animation: none; }
+html[data-motion="calm"] .quick-card { transform: rotate(var(--tilt, 0deg)); }
+html[data-motion="reduce"] .quick-card, html[data-motion="off"] .quick-card { transform: rotate(var(--tilt, 0deg)); }
+
+/* =====================================================================
+   Two-frame wobble — like the clip: the drawing snaps between a lean and
+   an upright pose (no in-between), over and over. steps(1) = hard cuts.
+   ===================================================================== */
+@keyframes wob2 { 0% { transform: rotate(-3deg) skewX(4deg) translateX(-1px); } 50% { transform: rotate(1.5deg) skewX(-1.5deg) translateX(0); } }
+@keyframes wob2-sm { 0% { transform: rotate(-1.4deg) skewX(2deg); } 50% { transform: rotate(.8deg) skewX(-1deg); } }
+@keyframes wob2-word { 0% { transform: rotate(-2.5deg) translateY(.5px); } 50% { transform: rotate(1deg) translateY(-.5px); } }
+@keyframes shake2 { 0% { transform: translateX(-2.5px); opacity: 1; } 50% { transform: translateX(2.5px); opacity: .55; } }
+
+/* Pip everywhere: lean / upright, with the outline boil in step */
+/* Pip stays put: no leaning, hopping, swaying or waving — only the outline boils between two drawings */
+.pip .pip-body, .pip.pose-celebrate .pip-body, .pip.pose-laugh .pip-body, .pip.pose-dizzy .pip-body,
+.pip .pip-sprout, .pip .pip-wave { animation: none; transform: none; }
+.pip-boil-a { animation: boil-a .44s steps(1) infinite; }
+.pip-boil-b { animation: boil-b .44s steps(1) infinite; }
+
+/* the Zone logo: Pip and the word wobble on their own, slightly out of step */
+.brand-pip, .tb-brand .pip { animation: none; }
+.brand-text b, .tb-brand b { display: inline-block; transform-origin: 20% 80%; animation: wob2-word .44s steps(1) infinite; animation-delay: -.22s; }
+
+/* buttons wobble by themselves too (small, so they stay easy to read and click); hover still does the jelly */
+.btn, .mp-play, .np-play, .mochi-btn { animation: wob2-sm .5s steps(1) infinite; }
+.icon-btn .ico { animation: wob2-sm .5s steps(1) infinite; }
+.btn:nth-of-type(2n), .icon-btn:nth-child(2n) .ico { animation-delay: -.25s; }
+
+/* home: rain in the window day and night, and Pip shaking with its little marks */
+html[data-theme="light"] .hero-room .hr-rain { stroke: rgba(74, 98, 120, .45); }
+.hero-room .hr-rain-2 { opacity: .55; animation-duration: .8s; }
+html[data-theme="light"] .hero-room .hr-sun { opacity: .45; }
+
+/* reduced motion / calm: everything holds still on the upright frame */
+html[data-motion="calm"] .pip-body, html[data-motion="calm"] .brand-pip, html[data-motion="calm"] .brand-text b, html[data-motion="calm"] .btn,
+html[data-motion="calm"] .icon-btn .ico, html[data-motion="calm"] .hr-shake, html[data-motion="calm"] .mp-play, html[data-motion="calm"] .np-play { animation: none; }
+
+/* ambience tiles: clear on/off state with a tiny live meter */
+.amb-toggle { justify-content: flex-start; }
+.amb-state { margin-left: auto; font-family: var(--font-hand); font-size: .92rem; color: var(--ink-3); display: inline-flex; align-items: center; gap: 5px; }
+.amb-item.on .amb-state { color: var(--accent-strong); font-weight: 700; }
+.amb-meter { display: inline-flex; gap: 2px; align-items: flex-end; height: 12px; }
+.amb-meter b { width: 3px; background: currentColor; border-radius: 2px; animation: amb-bar .9s steps(3) infinite; }
+.amb-meter b:nth-child(2) { animation-delay: -.3s; } .amb-meter b:nth-child(3) { animation-delay: -.6s; }
+@keyframes amb-bar { 0% { height: 4px; } 33% { height: 11px; } 66% { height: 7px; } }
+/* ambience grid: two even columns that never spill out of the panel */
+.amb-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.amb-item { min-width: 0; padding: 8px 10px 4px; }
+.amb-toggle { min-width: 0; gap: 6px; }
+.amb-toggle > span:not(.amb-state) { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.amb-state { flex: none; font-size: .84rem; }
+.amb-item input[type="range"] { width: 100%; min-width: 0; }
+@media (max-width: 420px) { .amb-state { font-size: 0; gap: 0; } .amb-state .amb-meter { font-size: .84rem; } }
+
+/* =====================================================================
+   Palette (2026-10-24): warm greys + oat, olive, cactus, fig, coral, clay, sky,
+   heather, iris, periwinkle. Overrides every earlier palette token.
+   ===================================================================== */
+:root {
+  --color-gray-000: #fff; --color-gray-050: #faf9f5; --color-gray-100: #f5f4ed; --color-gray-150: #f0eee6; --color-gray-200: #e8e6dc;
+  --color-gray-250: #dedcd1; --color-gray-300: #d1cfc5; --color-gray-350: #c2c0b6; --color-gray-400: #b0aea5; --color-gray-450: #9c9a92;
+  --color-gray-500: #87867f; --color-gray-550: #73726c; --color-gray-600: #5e5d59; --color-gray-650: #4d4c48; --color-gray-700: #3d3d3a;
+  --color-gray-750: #30302e; --color-gray-800: #262624; --color-gray-850: #1f1e1d; --color-gray-900: #1a1918; --color-gray-950: #141413; --color-gray-1000: #000;
+  --color-oat: #e3dacc; --color-olive: #788c5d; --color-cactus: #bcd1ca; --color-fig: #c46686; --color-coral: #ebcece;
+  --color-clay-primary: #d97757; --color-clay-interactive: #c6613f; --color-sky: #6a9bcc; --color-sky-interactive: #90c3f6;
+  --color-heather: #cbcadb; --color-iris: #dfdbfd; --color-iris-deep: #4a3aa7; --color-periwinkle: #cde2fb;
+  --color-periwinkle-deep: #184f95; --color-periwinkle-interactive: #154c92;
+}
+html[data-theme="light"] {
+  --sage: var(--color-cactus); --butter: var(--color-oat); --tan: var(--color-heather); --coral: var(--color-clay-primary);
+  --bg: var(--color-gray-100); --bg-2: var(--color-gray-150); --surface: var(--color-gray-050); --surface-2: var(--color-gray-100); --surface-3: var(--color-gray-200);
+  --line: var(--color-gray-250); --line-2: var(--color-gray-350);
+  --ink: var(--color-gray-950); --ink-2: var(--color-gray-650); --ink-3: var(--color-gray-550);
+  --doodle: var(--color-gray-800); --doodle-soft: rgba(38, 38, 36, .5);
+  --fill-a: var(--color-cactus); --fill-b: var(--color-oat); --fill-c: var(--color-coral); --fill-d: var(--color-clay-primary); --paper: var(--color-gray-050);
+  --accent: var(--color-clay-primary); --accent-strong: var(--color-clay-interactive); --accent-ink: var(--color-gray-950); --accent-soft: rgba(217, 119, 87, .14);
+  --glow: rgba(227, 218, 204, .9); --glow-0: rgba(227, 218, 204, 0);
+  --sky-a: var(--color-periwinkle); --sky-b: var(--color-gray-050);
+  --ink-line: rgba(20, 20, 19, .8); --ink-faint: rgba(20, 20, 19, .22); --hard: rgba(61, 61, 58, .18); --dots: rgba(135, 134, 127, .2); --tape: rgba(255, 255, 255, .65);
+  --note-1: var(--color-oat); --note-2: var(--color-cactus); --note-3: var(--color-coral); --note-4: var(--color-iris); --note-5: var(--color-periwinkle);
+  --overlay: rgba(20, 20, 19, .3);
+}
+html[data-theme="dark"] {
+  --sage: var(--color-olive); --butter: var(--color-oat); --tan: var(--color-heather); --coral: var(--color-clay-primary);
+  --bg: var(--color-gray-900); --bg-2: var(--color-gray-950); --surface: var(--color-gray-850); --surface-2: var(--color-gray-800); --surface-3: var(--color-gray-750);
+  --line: var(--color-gray-700); --line-2: var(--color-gray-650);
+  --ink: var(--color-gray-100); --ink-2: var(--color-gray-350); --ink-3: var(--color-gray-450);
+  --doodle: var(--color-gray-200); --doodle-soft: rgba(232, 230, 220, .5);
+  --fill-a: var(--color-olive); --fill-b: var(--color-clay-primary); --fill-c: var(--color-fig); --fill-d: var(--color-sky); --paper: var(--color-gray-800);
+  --accent: var(--color-clay-primary); --accent-strong: #e8957a; --accent-ink: var(--color-gray-950); --accent-soft: rgba(217, 119, 87, .18);
+  --glow: rgba(217, 119, 87, .45); --glow-0: rgba(217, 119, 87, 0);
+  --sky-a: var(--color-gray-950); --sky-b: var(--color-gray-800);
+  --ink-line: rgba(232, 230, 220, .6); --ink-faint: rgba(232, 230, 220, .2); --hard: rgba(0, 0, 0, .45); --dots: rgba(232, 230, 220, .07); --tape: rgba(255, 255, 255, .14);
+  --note-1: #3a362f; --note-2: #2f3a36; --note-3: #3d3133; --note-4: #34324a; --note-5: #2b3646;
+  --overlay: rgba(0, 0, 0, .5);
+}
+/* accent choices */
+html[data-theme="light"][data-accent="honey"] { --accent: var(--color-sky); --accent-strong: var(--color-periwinkle-deep); --accent-ink: #fff; --accent-soft: rgba(106, 155, 204, .16); }
+html[data-theme="light"][data-accent="moss"] { --accent: var(--color-olive); --accent-strong: #5c6d46; --accent-ink: #fff; --accent-soft: rgba(120, 140, 93, .16); }
+html[data-theme="light"][data-accent="rose"] { --accent: var(--color-fig); --accent-strong: #a14b69; --accent-ink: #fff; --accent-soft: rgba(196, 102, 134, .14); }
+html[data-theme="dark"][data-accent="honey"] { --accent: var(--color-sky); --accent-strong: var(--color-sky-interactive); --accent-ink: var(--color-gray-950); --accent-soft: rgba(106, 155, 204, .2); }
+html[data-theme="dark"][data-accent="moss"] { --accent: var(--color-olive); --accent-strong: #a6ba8a; --accent-ink: var(--color-gray-950); --accent-soft: rgba(120, 140, 93, .22); }
+html[data-theme="dark"][data-accent="rose"] { --accent: var(--color-fig); --accent-strong: #e08aa7; --accent-ink: var(--color-gray-950); --accent-soft: rgba(196, 102, 134, .22); }
+/* art: covers, track art, memory cards, hero books, Pip */
+.cv-sage { --cv: var(--color-cactus); } .cv-butter { --cv: var(--color-oat); } .cv-tan { --cv: var(--color-heather); }
+.cv-coral { --cv: var(--color-coral); } .cv-slate { --cv: var(--color-periwinkle); } .cv-rose { --cv: var(--color-iris); }
+html[data-theme] .cv-sage { --cv: var(--color-cactus); } html[data-theme] .cv-butter { --cv: var(--color-oat); } html[data-theme] .cv-tan { --cv: var(--color-heather); }
+html[data-theme] .cv-coral { --cv: var(--color-coral); } html[data-theme] .cv-slate { --cv: var(--color-periwinkle); } html[data-theme] .cv-rose { --cv: var(--color-iris); }
+html[data-theme] .ta-a { --ta: var(--color-cactus); } html[data-theme] .ta-b { --ta: var(--color-oat); } html[data-theme] .ta-c { --ta: var(--color-heather); } html[data-theme] .ta-d { --ta: var(--color-coral); }
+html[data-theme] .m-a { background: var(--color-cactus); } html[data-theme] .m-b { background: var(--color-oat); } html[data-theme] .m-c { background: var(--color-periwinkle); } html[data-theme] .m-d { background: var(--color-coral); }
+html[data-theme="dark"] .hero-room .hr-b1 { fill: var(--color-olive); } html[data-theme="dark"] .hero-room .hr-b2 { fill: var(--color-fig); }
+html[data-theme="dark"] .hero-room .hr-b3 { fill: var(--color-oat); } html[data-theme="dark"] .hero-room .hr-b4 { fill: var(--color-sky); }
+html[data-theme="light"] .hero-room .hr-rain { stroke: rgba(24, 79, 149, .38); }
+
+/* Pip keeps its original colours whatever the palette: butter body, sage sprout, coral cheeks (peach at night) */
+.pip .pip-fill { fill: #ffe1a8; }
+.pip .pip-leaf { fill: #c9cba3; }
+.pip .pip-ink { stroke: #3a2e28; }
+.pip .pip-eye, .pip .pip-mouth { fill: #3a2e28; }
+.pip .pip-cheek { fill: #e26d5c; opacity: .45; }
+.pip .pip-heart { fill: #e26d5c; }
+html[data-theme="dark"] .pip .pip-fill { fill: #d99b7f; }
+html[data-theme="dark"] .pip .pip-ink { stroke: #1b1f2a; }
+html[data-theme="dark"] .pip .pip-eye, html[data-theme="dark"] .pip .pip-mouth { fill: #1b1f2a; }
+html[data-theme="dark"] .pip .pip-cheek { fill: #a56f63; opacity: .7; }

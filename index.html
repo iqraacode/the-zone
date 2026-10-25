@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Zone — get in the zone</title>
+  <meta name="description" content="Read, watch, play, listen and rest in a small hand-drawn sanctuary.">
+  <meta name="theme-color" content="#f5f4ed">
+  <!-- Apply the saved theme before first paint so the wrong theme never flashes -->
+  <script>
+    (function () {
+      var s = {};
+      try { s = JSON.parse(localStorage.getItem('nook:settings') || '{}') || {}; } catch (e) {}
+      var mode = s.theme || 'auto', h = new Date().getHours();
+      var ds = typeof s.dayStart === 'number' ? s.dayStart : 7, ns = typeof s.nightStart === 'number' ? s.nightStart : 19;
+      var t = mode === 'light' || mode === 'dark' ? mode : (h >= ds && h < ns ? 'light' : 'dark');
+      var d = document.documentElement;
+      d.setAttribute('data-theme', t);
+      d.setAttribute('data-accent', s.accent || 'ember');
+      var sysReduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var m = s.motion || 'system';
+      d.setAttribute('data-motion', m === 'reduce' || (m === 'system' && sysReduce) ? 'reduce' : (s.anim || 'full'));
+      d.style.setProperty('--text-scale', ((s.textScale || 100) / 100).toString());
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Kalam:wght@400;700&family=Lexend:wght@400;500;600;700&family=Righteous&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css?v=20261024b">
+  <link rel="stylesheet" href="css/pages.css?v=20261024b">
+  <link rel="stylesheet" href="css/games.css?v=20261024b">
+  <link rel="stylesheet" href="css/chess.css?v=20261024b">
+  <link rel="stylesheet" href="css/handmade.css?v=20261024b">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M32 10c13 0 22 9 22 22s-9 22-22 22-22-9-22-22 9-22 22-22z' fill='%23ffe1a8' stroke='%233a2e28' stroke-width='4'/%3E%3Ccircle cx='25' cy='31' r='3.5' fill='%233a2e28'/%3E%3Ccircle cx='39' cy='31' r='3.5' fill='%233a2e28'/%3E%3Cpath d='M32 10c0-5 3-7 7-7' fill='none' stroke='%23c9cba3' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+</head>
+<body>
+  <a class="skip-link" href="#view">Skip to content</a>
+
+  <div class="app" id="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation"></aside>
+
+    <div class="main-col">
+      <header class="topbar" id="topbar"></header>
+      <main id="view" class="view" tabindex="-1" aria-live="polite"></main>
+    </div>
+  </div>
+
+  <div class="mini-player" id="mini-player" hidden></div>
+  <nav class="bottom-nav" id="bottom-nav" aria-label="Main navigation"></nav>
+
+  <div class="search-overlay" id="search-overlay" hidden></div>
+  <div class="ambient-panel" id="ambient-panel" hidden></div>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+
+  <noscript><p style="padding:2rem;font-family:sans-serif">Zone needs JavaScript to run.</p></noscript>
+
+  <script src="js/core.js?v=20261024b"></script>
+  <script src="js/sketch.js?v=20261024b"></script>
+  <script src="js/content.js?v=20261024b"></script>
+  <script src="js/audio.js?v=20261024b"></script>
+  <script src="js/shell.js?v=20261024b"></script>
+  <script src="js/pages/home.js?v=20261024b"></script>
+  <script src="js/pages/all.js?v=20261024b"></script>
+  <script src="js/pages/reading.js?v=20261024b"></script>
+  <script src="js/pages/videos.js?v=20261024b"></script>
+  <script src="js/pages/music.js?v=20261024b"></script>
+  <script src="js/pages/games.js?v=20261024b"></script>
+  <script src="js/games/minesweeper.js?v=20261024b"></script>
+  <script src="js/games/g2048.js?v=20261024b"></script>
+  <script src="js/games/memory.js?v=20261024b"></script>
+  <script src="js/games/tictactoe.js?v=20261024b"></script>
+  <script src="js/chess-engine.js?v=20261024b"></script>
+  <script src="js/pages/chess.js?v=20261024b"></script>
+  <script src="js/pages/settings.js?v=20261024b"></script>
+  <script src="js/pages/pip.js?v=20261024b"></script>
+  <script src="js/app.js?v=20261024b"></script>
+</body>
+</html>
